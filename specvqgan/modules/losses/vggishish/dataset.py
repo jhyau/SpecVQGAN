@@ -100,6 +100,9 @@ class VGGSound(torch.utils.data.Dataset):
         with open(os.path.join(self.splits_path, 'vggsound_train.txt'), 'w') as train_file, \
              open(os.path.join(self.splits_path, 'vggsound_valid.txt'), 'w') as valid_file, \
              open(os.path.join(self.splits_path, 'vggsound_test.txt'), 'w') as test_file:
+        #with open(os.path.join(self.splits_path, 'asmr_by_material_train_true.txt'), 'w') as train_file, \
+        #     open(os.path.join(self.splits_path, 'asmr_by_material_test.txt'), 'w') as valid_file, \
+        #     open(os.path.join(self.splits_path, 'asmr_by_material_test_true.txt'), 'w') as test_file:
             for path in available_vid_paths:
                 path = path.replace('_mel.npy', '')
                 vid_name = Path(path).name

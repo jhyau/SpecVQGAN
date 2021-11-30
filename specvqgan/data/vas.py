@@ -89,13 +89,20 @@ class ResampleFrames(object):
 class VASSpecs(torch.utils.data.Dataset):
 
     def __init__(self, split, spec_dir_path, mel_num=None, spec_len=None, spec_crop_len=None,
-                 random_crop=None, crop_coord=None, for_which_class=None):
+                 random_crop=None, crop_coord=None, for_which_class=None, split_path=None):
         super().__init__()
         self.split = split
         self.spec_dir_path = spec_dir_path
         # fixing split_path in here because of compatibility with vggsound which hangles it in vggishish
-        self.split_path = f'./data/vas_{split}.txt'
+        #self.split_path = f'./data/vas_{split}.txt'
+        if split == 'train':
+            self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_train.txt"
+        elif split == 'valid':
+            self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_test.txt"
         self.feat_suffix = '_mel.npy'
+        
+        print(f"split_path: {self.split_path}")
+        print(f"mel_num: {mel_num}, spec_len: {spec_len}, split: {split}")
 
         if not os.path.exists(self.split_path):
             print(f'split does not exist in {self.split_path}. Creating new ones...')
@@ -108,21 +115,48 @@ class VASSpecs(torch.utils.data.Dataset):
         else:
             self.dataset = full_dataset
 
-        unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
+        print(f"dataset example: {self.dataset[0]}")
+        #unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
+        unique_classes = sorted(list(set([self.__get_label__(cls_vid) for cls_vid in self.dataset])))
         self.label2target = {label: target for target, label in enumerate(unique_classes)}
 
+        print(f"unique classes: {unique_classes}")
+
         self.transforms = CropImage([mel_num, spec_crop_len], random_crop)
+
+    def __get_label__(self, video_name):
+        """Getting the corresponding label from the video name"""
+        tokens = video_name.split("-")
+        # <video_name>-[label-label]-<num>-of-<num>
+        start_index = 1
+        end_index = -4
+        
+        # To generalize material of the same class (e.g. ceramic-plate and ceramic are same label)
+        return tokens[start_index]
+
+        #label_tokens = tokens[start_index:(end_index+1)]
+        #label = ""
+        #for tok in label_tokens:
+        #    # Count the labels with 2 as duplicates (for now)
+        #    if not tok.isdigit():
+        #        label += tok + " "
+
+        #return label.strip()
 
     def __getitem__(self, idx):
         item = {}
 
-        cls, vid = self.dataset[idx].split('/')
-        spec_path = os.path.join(self.spec_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
+        #cls, vid = self.dataset[idx].split('/')
+        #spec_path = os.path.join(self.spec_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
+        vid = self.dataset[idx]
+        spec_path = os.path.join(self.spec_dir_path, f'{vid}{self.feat_suffix}')
 
         spec = np.load(spec_path)
         item['input'] = spec
         item['file_path_'] = spec_path
 
+        #item['label'] = cls
+        cls = self.__get_label__(vid)
         item['label'] = cls
         item['target'] = self.label2target[cls]
 
