@@ -57,7 +57,7 @@ lightning:
   fitloop:
     target: pytorch_lightning.loops.FitLoop
     params:
-      max_epochs: 500
+      max_epochs: 400
   callbacks:
     image_logger:
       target: train.ImageLogger
@@ -66,7 +66,7 @@ lightning:
         vocoder_cfg:
           target: train.VocoderMelGan
           params:
-            ckpt_vocoder: './vocoder/logs/vggsound/'
+            ckpt_vocoder: './vocoder/logs/asmr_by_material/'
     early_stop_callback:
       target: pytorch_lightning.callbacks.EarlyStopping
       params:
@@ -84,15 +84,17 @@ data:
     batch_size: 2
     num_workers: 8
 
-    spec_dir_path: './data/vas/features/*/melspec_10s_22050hz'
-    sample_rate: 22050
+    spec_dir_path: '/juno/u/jyau/regnet/data/features/ASMR/orig_asmr_by_material_clips/melspec_10s_44100hz/'
+    sample_rate: 44100
     mel_num: 80
-    spec_len: 860
-    spec_crop_len: 848
+    spec_len: 1720
+    spec_crop_len: 848  #1712
     random_crop: False
 
-    rgb_feats_dir_path: './data/vas/features/*/feature_rgb_bninception_dim1024_21.5fps' # BNInception features
-    flow_feats_dir_path: './data/vas/features/*/feature_flow_bninception_dim1024_21.5fps' # BNInception features
+    rgb_feats_dir_path: '/juno/u/jyau/regnet/data/features/ASMR/orig_asmr_by_material_clips/feature_rgb_bninception_dim1024_21.5fps'
+    flow_feats_dir_path: '/juno/u/jyau/regnet/data/features/ASMR/orig_asmr_by_material_clips/feature_flow_bninception_dim1024_21.5fps'
+    #rgb_feats_dir_path: './data/vas/features/*/feature_rgb_bninception_dim1024_21.5fps' # BNInception features
+    #flow_feats_dir_path: './data/vas/features/*/feature_flow_bninception_dim1024_21.5fps' # BNInception features
     # rgb_feats_dir_path: './data/vas/features/*/feature_resnet50_dim2048_21.5fps' # ResNet50 features
     feat_depth: 2048
     feat_len: 215
@@ -107,13 +109,13 @@ data:
       target: specvqgan.data.vas.VASSpecsCondOnFeatsTrain
       params:
         specs_dataset_cfg:
-          split_path: './data/vas_train.txt'
+          split_path: '/juno/u/jyau/regnet/filelists/asmr_by_material_train.txt'
         condition_dataset_cfg:
-          split_path: './data/vas_train.txt'
+          split_path: '/juno/u/jyau/regnet/filelists/asmr_by_material_train.txt'
     validation:
       target: specvqgan.data.vas.VASSpecsCondOnFeatsValidation
       params:
         specs_dataset_cfg:
-          split_path: './data/vas_valid.txt'
+          split_path: '/juno/u/jyau/regnet/filelists/asmr_by_material_test.txt'
         condition_dataset_cfg:
-          split_path: './data/vas_valid.txt'
+          split_path: '/juno/u/jyau/regnet/filelists/asmr_by_material_test.txt'

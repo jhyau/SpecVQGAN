@@ -214,19 +214,44 @@ class VASFeats(torch.utils.data.Dataset):
         else:
             self.dataset = full_dataset
 
-        unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
+        print(f"dataset example: {self.dataset[0]}")
+        unique_classes = sorted(list(set([self.__get_label__(cls_vid) for cls_vid in self.dataset])))
+        #unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
         self.label2target = {label: target for target, label in enumerate(unique_classes)}
+
+        print(f"unique classes: {unique_classes}")
 
         self.feats_transforms = CropFeats([feat_crop_len, feat_depth], random_crop)
         # self.normalizer = StandardNormalizeFeats(rgb_feats_dir_path, flow_feats_dir_path, feat_len)
         # ResampleFrames
         self.feat_sampler = None if feat_sampler_cfg is None else instantiate_from_config(feat_sampler_cfg)
 
+    def __get_label__(self, video_name):
+        """Getting the corresponding label from the video name"""
+        tokens = video_name.split("-")
+        # <video_name>-[label-label]-<num>-of-<num>
+        start_index = 1
+        end_index = -4
+
+        # To generalize material of the same class (e.g. ceramic-plate and ceramic are same label)
+        return tokens[start_index]
+
+        #label_tokens = tokens[start_index:(end_index+1)]
+        #label = ""
+        #for tok in label_tokens:
+        #    # Count the labels with 2 as duplicates (for now)
+        #    if not tok.isdigit():
+        #        label += tok + " "
+
+        #return label.strip()
+
     def __getitem__(self, idx):
         item = dict()
-        cls, vid = self.dataset[idx].split('/')
+        #cls, vid = self.dataset[idx].split('/')
+        vid = self.dataset[idx]
 
-        rgb_path = os.path.join(self.rgb_feats_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
+        #rgb_path = os.path.join(self.rgb_feats_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
+        rgb_path = os.path.join(self.rgb_feats_dir_path, f'{vid}{self.feat_suffix}')
         # just a dummy random features acting like a fake interface for no features experiment
         if self.replace_feats_with_random:
             rgb_feats = np.random.rand(self.feat_len, self.feat_depth//2).astype(np.float32)
@@ -237,7 +262,8 @@ class VASFeats(torch.utils.data.Dataset):
 
         # also preprocess flow
         if self.flow_feats_dir_path is not None:
-            flow_path = os.path.join(self.flow_feats_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
+            #flow_path = os.path.join(self.flow_feats_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
+            flow_path = os.path.join(self.flow_feats_dir_path, f'{vid}{self.feat_suffix}')
             # just a dummy random features acting like a fake interface for no features experiment
             if self.replace_feats_with_random:
                 flow_feats = np.random.rand(self.feat_len, self.feat_depth//2).astype(np.float32)
@@ -251,7 +277,8 @@ class VASFeats(torch.utils.data.Dataset):
         feats_padded = np.zeros((self.feat_len, feats.shape[1]))
         feats_padded[:feats.shape[0], :] = feats[:self.feat_len, :]
         item['feature'] = feats_padded
-
+        
+        cls = self.__get_label__(vid)
         item['label'] = cls
         item['target'] = self.label2target[cls]
 
