@@ -723,6 +723,8 @@ if __name__ == '__main__':
         print('Setting learning rate to {:.2e} = {} (accumulate_grad_batches) * {} (num_gpus) * {} (batchsize) * {:.2e} (base_lr)'.format(
             model.learning_rate, accumulate_grad_batches, ngpu, bs, base_lr))
 
+        print(f"Trainer max_epochs: {trainer.max_epochs}")
+
         # allow checkpointing via USR1
         def melk(*args, **kwargs):
             # run all checkpoint hooks

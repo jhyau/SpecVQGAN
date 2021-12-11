@@ -54,10 +54,6 @@ lightning:
       monitor: val/loss
       mode: min
       save_last:
-  fitloop:
-    target: pytorch_lightning.loops.FitLoop
-    params:
-      max_epochs: 400
   callbacks:
     image_logger:
       target: train.ImageLogger
