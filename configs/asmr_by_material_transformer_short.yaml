@@ -55,7 +55,7 @@ lightning:
       mode: min
       save_last:
   trainer:
-    max_epochs: 400
+    max_epochs: 300
   callbacks:
     image_logger:
       target: train.ImageLogger
