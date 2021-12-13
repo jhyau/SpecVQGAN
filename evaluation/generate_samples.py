@@ -16,6 +16,8 @@ from omegaconf import OmegaConf
 from train import instantiate_from_config
 from copy import deepcopy
 
+from sample_visualization import load_vocoder
+
 def save_config(cfg):
     cfg_to_save = deepcopy(cfg)
     # remove sensitive info
@@ -93,10 +95,11 @@ def load_model_and_dataloaders(cfg, device, is_ddp=False):
     dsets.datasets = {split: dset for split, dset in dsets.datasets.items() if split in cfg.sampler.splits}
 
     # loading the vocoder
-    # ckpt_vocoder = cfg.lightning.callbacks.image_logger.params.vocoder_cfg.params.ckpt_vocoder
-    # if ckpt_vocoder:
-    #     vocoder = load_vocoder(ckpt_vocoder, eval_mode=True)['model'].to('cuda')
-    vocoder = None
+    ckpt_vocoder = cfg.lightning.callbacks.image_logger.params.vocoder_cfg.params.ckpt_vocoder
+    if ckpt_vocoder:
+        vocoder = load_vocoder(ckpt_vocoder, eval_mode=True)['model'].to('cuda')
+    else:
+        vocoder = None
 
     # now load the specified checkpoint
     if ckpt_model:
@@ -255,8 +258,11 @@ def save_specs(cfg, specs, samples_split_dirs, model, batch, split, sample_id, v
         print(f"Saving the sampled spectrograms... {sanity}")
         np.save(save_path / f'{vidname}_sample_{sample_id}.npy', spec)
         if vocoder is not None:
+            print("Passed through vocoder to get audio...")
             wave_from_vocoder = vocoder(torch.from_numpy(spec).unsqueeze(0).to('cuda')).cpu().squeeze().detach().numpy()
-            soundfile.write(save_path / f'{vidname}_sample_{sample_id}.wav', wave_from_vocoder, 22050, 'PCM_24')
+            print(save_path / f'{vidname}_sample_{sample_id}.wav')
+            # Original audio sample rate: 22050
+            soundfile.write(save_path / f'{vidname}_sample_{sample_id}.wav', wave_from_vocoder, int(cfg.data.params.sample_rate), 'PCM_24')
 
 
 def sample(gpu_id, cfg, samples_split_dirs, is_ddp):

@@ -38,7 +38,7 @@ else
     exit
 fi
 
-
+NOW="eval"
 # Some info to print
 echo "Local Scratch" $LOCAL_SCRATCH
 echo "Hostlist:" $HOSTLIST
