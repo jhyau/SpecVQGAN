@@ -24,6 +24,7 @@ def save_config(cfg):
             cfg_to_save.sampler.pop(key)
     # make a path, dir and save the config
     save_dir = Path(cfg_to_save.sampler.model_logdir) / f'samples_{cfg.sampler.now}'
+    print(f"Creating new save dir for samples: {save_dir}")
     os.makedirs(save_dir, exist_ok=True)
     OmegaConf.save(cfg_to_save, save_dir / 'full_sampling_cfg.yaml')
 
@@ -43,15 +44,17 @@ def load_and_save_config():
     # the latter arguments are prioritized
     cfg = OmegaConf.merge(*configs_model_base, *configs_lightning_base, cfg_cli_sampler)
     # patch cfg. E.g. if the model is trained on another machine with different paths
-    for a in ['spec_dir_path', 'rgb_feats_dir_path', 'flow_feats_dir_path']:
-        # TODO: `config_cli.data` is a bit ambigiuous because we can pass some other fields besides paths in data
-        if config_cli.data is None:
-            if cfg.data.params[a] is not None:
-                if 'vggsound.VGGSound' in cfg.data.params.train.target:
-                    cfg.data.params[a] = os.path.join('./data/vggsound/', Path(cfg.data.params[a]).name)
-                elif 'vas.VAS' in cfg.data.params.train.target:
-                    cfg.data.params[a] = os.path.join('./data/vas/features/*', Path(cfg.data.params[a]).name)
+    #for a in ['spec_dir_path', 'rgb_feats_dir_path', 'flow_feats_dir_path']:
+    #    # TODO: `config_cli.data` is a bit ambigiuous because we can pass some other fields besides paths in data
+    #    if config_cli.data is None:
+    #        if cfg.data.params[a] is not None:
+    #            if 'vggsound.VGGSound' in cfg.data.params.train.target:
+    #                cfg.data.params[a] = os.path.join('./data/vggsound/', Path(cfg.data.params[a]).name)
+    #            elif 'vas.VAS' in cfg.data.params.train.target:
+    #                cfg.data.params[a] = os.path.join('./data/vas/features/*', Path(cfg.data.params[a]).name)
 
+    cfg.sampler.splits = ['validation'] # hardcoding the split in
+    print(f"THIS IS THE CONFIG: {cfg}")
     # save the config
     save_config(cfg)
     return cfg
@@ -248,6 +251,8 @@ def save_specs(cfg, specs, samples_split_dirs, model, batch, split, sample_id, v
         spec = spec.squeeze(0).cpu().numpy()
         # audios are in [-1, 1], making them in [0, 1]
         spec = (spec + 1) / 2
+        sanity = save_path / f'{vidname}_sample_{sample_id}.npy'
+        print(f"Saving the sampled spectrograms... {sanity}")
         np.save(save_path / f'{vidname}_sample_{sample_id}.npy', spec)
         if vocoder is not None:
             wave_from_vocoder = vocoder(torch.from_numpy(spec).unsqueeze(0).to('cuda')).cpu().squeeze().detach().numpy()
@@ -293,7 +298,7 @@ def main():
         is_ddp = False
         print(OmegaConf.to_yaml(cfg))
         local_rank = 0
-
+    print(f"local_rank: {local_rank}")
     sample(local_rank, cfg, samples_split_dirs, is_ddp)
 
 
