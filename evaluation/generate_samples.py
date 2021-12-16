@@ -97,6 +97,7 @@ def load_model_and_dataloaders(cfg, device, is_ddp=False):
     # loading the vocoder
     ckpt_vocoder = cfg.lightning.callbacks.image_logger.params.vocoder_cfg.params.ckpt_vocoder
     if ckpt_vocoder:
+        print(f"vocoder found! {ckpt_vocoder}")
         vocoder = load_vocoder(ckpt_vocoder, eval_mode=True)['model'].to('cuda')
     else:
         vocoder = None

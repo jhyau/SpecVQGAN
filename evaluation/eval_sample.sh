@@ -1,6 +1,7 @@
 # Path to experiment
 #EXPERIMENT_PATH=./logs/2021-06-09T15-17-18_vas_transformer
 EXPERIMENT_PATH=./logs/2021-12-11T17-05-22_asmr_by_material_transformer
+#EXPERIMENT_PATH=./logs/2021-11-30T07-58-56_asmr_by_material_codebook
 
 # Select a dataset here
 DATASET="VAS"
