@@ -93,14 +93,20 @@ class VASSpecs(torch.utils.data.Dataset):
         super().__init__()
         self.split = split
         self.spec_dir_path = spec_dir_path
+        
+        print(f"split: {self.split}")
+
         # fixing split_path in here because of compatibility with vggsound which hangles it in vggishish
         #self.split_path = f'./data/vas_{split}.txt'
         if split == 'train':
+            #self.split_path = f"/juno/u/jyau/regnet/filelists/dog_train.txt"
             self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_train.txt"
         elif split == 'valid':
+            #self.split_path = f"/juno/u/jyau/regnet/filelists/dog_test.txt"
             self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_test.txt"
         self.feat_suffix = '_mel.npy'
         
+        print(f"spec_dir_path: {self.spec_dir_path}")
         print(f"split_path: {self.split_path}")
         print(f"mel_num: {mel_num}, spec_len: {spec_len}, split: {split}")
 
@@ -114,9 +120,15 @@ class VASSpecs(torch.utils.data.Dataset):
             self.dataset = [v for v in full_dataset if v.startswith(for_which_class)]
         else:
             self.dataset = full_dataset
-
+        
         print(f"dataset example: {self.dataset[0]}")
+
+        # Use this line for getting classes for regnet VAS
+        #unique_classes = sorted(list(set([spec_dir_path.split('/')[-2]])))
+
         #unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
+
+        # Use this line for getting classes for asmr_by_material clips
         unique_classes = sorted(list(set([self.__get_label__(cls_vid) for cls_vid in self.dataset])))
         self.label2target = {label: target for target, label in enumerate(unique_classes)}
 
@@ -130,6 +142,9 @@ class VASSpecs(torch.utils.data.Dataset):
         # <video_name>-[label-label]-<num>-of-<num>
         start_index = 1
         end_index = -4
+
+        if tokens[start_index] == 'stone_floor':
+            tokens[start_index] = 'stone'
         
         # To generalize material of the same class (e.g. ceramic-plate and ceramic are same label)
         return tokens[start_index]
@@ -147,6 +162,9 @@ class VASSpecs(torch.utils.data.Dataset):
         item = {}
 
         #cls, vid = self.dataset[idx].split('/')
+
+        # Use this when training on regnet's VAS
+        #cls = self.spec_dir_path.split('/')[-2]
         #spec_path = os.path.join(self.spec_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
         vid = self.dataset[idx]
         spec_path = os.path.join(self.spec_dir_path, f'{vid}{self.feat_suffix}')
@@ -155,7 +173,6 @@ class VASSpecs(torch.utils.data.Dataset):
         item['input'] = spec
         item['file_path_'] = spec_path
 
-        #item['label'] = cls
         cls = self.__get_label__(vid)
         item['label'] = cls
         item['target'] = self.label2target[cls]
@@ -215,8 +232,8 @@ class VASFeats(torch.utils.data.Dataset):
             self.dataset = full_dataset
 
         print(f"dataset example: {self.dataset[0]}")
-        unique_classes = sorted(list(set([self.__get_label__(cls_vid) for cls_vid in self.dataset])))
-        #unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
+        #unique_classes = sorted(list(set([self.__get_label__(cls_vid) for cls_vid in self.dataset])))
+        unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
         self.label2target = {label: target for target, label in enumerate(unique_classes)}
 
         print(f"unique classes: {unique_classes}")
@@ -247,11 +264,11 @@ class VASFeats(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         item = dict()
-        #cls, vid = self.dataset[idx].split('/')
-        vid = self.dataset[idx]
+        cls, vid = self.dataset[idx].split('/')
+        #vid = self.dataset[idx]
 
-        #rgb_path = os.path.join(self.rgb_feats_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
-        rgb_path = os.path.join(self.rgb_feats_dir_path, f'{vid}{self.feat_suffix}')
+        rgb_path = os.path.join(self.rgb_feats_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
+        #rgb_path = os.path.join(self.rgb_feats_dir_path, f'{vid}{self.feat_suffix}')
         # just a dummy random features acting like a fake interface for no features experiment
         if self.replace_feats_with_random:
             rgb_feats = np.random.rand(self.feat_len, self.feat_depth//2).astype(np.float32)
@@ -262,8 +279,8 @@ class VASFeats(torch.utils.data.Dataset):
 
         # also preprocess flow
         if self.flow_feats_dir_path is not None:
-            #flow_path = os.path.join(self.flow_feats_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
-            flow_path = os.path.join(self.flow_feats_dir_path, f'{vid}{self.feat_suffix}')
+            flow_path = os.path.join(self.flow_feats_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
+            #flow_path = os.path.join(self.flow_feats_dir_path, f'{vid}{self.feat_suffix}')
             # just a dummy random features acting like a fake interface for no features experiment
             if self.replace_feats_with_random:
                 flow_feats = np.random.rand(self.feat_len, self.feat_depth//2).astype(np.float32)
@@ -278,7 +295,7 @@ class VASFeats(torch.utils.data.Dataset):
         feats_padded[:feats.shape[0], :] = feats[:self.feat_len, :]
         item['feature'] = feats_padded
         
-        cls = self.__get_label__(vid)
+        #cls = self.__get_label__(vid)
         item['label'] = cls
         item['target'] = self.label2target[cls]
 

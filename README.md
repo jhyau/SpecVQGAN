@@ -385,6 +385,12 @@ python train.py --base configs/vas_codebook.yaml -t True --gpus 0,
 python train.py --base configs/vggsound_codebook.yaml -t True --gpus 0,
 ```
 
+Example of running codebook, with max epochs added and resuming from a checkpoint:
+```bash
+python train.py --base /juno/u/jyau/SpecVQGAN/configs/asmr_by_material_codebook.yaml -t True --resume logs/2022-01-31T04-21-36_asmr_by_materi
+al_codebook  --max_epochs 500 --gpus 0,
+```
+
 ## Training a Transformer
 A transformer (GPT-2) is trained to sample from the spectrogram codebook given a set of frame-level visual features.
 
