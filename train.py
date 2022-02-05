@@ -577,6 +577,13 @@ if __name__ == '__main__':
             else:
                 ckpt = sorted(Path(logdir).glob('checkpoints/*.ckpt'))[-1]
 
+            # If name is different, change the logdir when saving new ckpts
+            if opt.name:
+                name = '_'+opt.name
+                nowname = now+name+opt.postfix
+                logdir = os.path.join('logs', nowname)
+
+
         opt.resume_from_checkpoint = ckpt
         base_configs = sorted(glob.glob(os.path.join(logdir, 'configs/*.yaml')))
         opt.base = base_configs+opt.base
@@ -595,8 +602,12 @@ if __name__ == '__main__':
         logdir = os.path.join('logs', nowname)
 
     print(nowname)
+    print(f"logdir: {logdir}")
     ckptdir = os.path.join(logdir, 'checkpoints')
     cfgdir = os.path.join(logdir, 'configs')
+    print(f"ckptdir: {ckptdir}")
+    print(f"cfgdir: {cfgdir}")
+
     seed_everything(opt.seed)
 
     try:
