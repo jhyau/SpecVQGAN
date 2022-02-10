@@ -63,6 +63,7 @@ def load_and_save_config():
 
 def make_folder_for_samples(cfg):
     assert Path(cfg.sampler.model_logdir).exists()
+    print(f"data params: {cfg.data.params.train.target}")
     dataset_name = cfg.data.params.train.target.split('.')[-1]
     if 'VGGSound' in dataset_name:
         dataset_name = 'VGGSound'

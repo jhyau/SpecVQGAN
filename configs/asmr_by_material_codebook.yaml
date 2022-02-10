@@ -59,8 +59,10 @@ data:
       params:
         specs_dataset_cfg:
           split_path: '/juno/u/jyau/regnet/filelists/asmr_by_material_train.txt'
+          dataset_type: "asmr"
     validation:
       target: specvqgan.data.vas.VASSpecsValidation
       params:
         specs_dataset_cfg:
           split_path: '/juno/u/jyau/regnet/filelists/asmr_by_material_test.txt'
+          dataset_type: "asmr"

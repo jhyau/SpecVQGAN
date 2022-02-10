@@ -59,8 +59,10 @@ data:
       params:
         specs_dataset_cfg:
           split_path: '/juno/u/jyau/regnet/filelists/dog_train.txt'  #'./data/vas_train.txt'
+          dataset_type: 'vas'
     validation:
       target: specvqgan.data.vas.VASSpecsValidation
       params:
         specs_dataset_cfg:
           split_path: '/juno/u/jyau/regnet/filelists/dog_test.txt'  #'./data/vas_valid.txt'
+          dataset_type: 'vas'

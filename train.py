@@ -131,6 +131,18 @@ def instantiate_from_config(config):
     return get_obj_from_str(config['target'])(**config.get('params', dict()))
 
 
+def instantiate_train_from_config(config):
+    if not 'target' in config:
+        raise KeyError('Expected key `target` to instantiate.')
+    return get_obj_from_str(config['target'])(**config['params']['train'].get('params', dict()))
+
+
+def instantiate_val_from_config(config):
+    if not 'target' in config:
+        raise KeyError('Expected key `target` to instantiate.')
+    return get_obj_from_str(config['target'])(**config['params']['validation'].get('params', dict()))
+
+
 class WrappedDataset(Dataset):
     '''Wraps an arbitrary object with __len__ and __getitem__ into a pytorch dataset'''
     def __init__(self, dataset):
@@ -151,9 +163,15 @@ class DataModuleFromConfig(pl.LightningDataModule):
         self.dataset_configs = dict()
         self.num_workers = num_workers if num_workers is not None else batch_size*2
         if train is not None:
+            #train_spec = instantiate_train_from_config(train)
+            #train.update(train_spec)
+            print(f"setting up train data... {train}")
             self.dataset_configs['train'] = train
             self.train_dataloader = self._train_dataloader
         if validation is not None:
+            #val_spec = instantiate_val_from_config(validation)
+            #validation.update(val_spec)
+            print(f"setting up val data... {validation}")
             self.dataset_configs['validation'] = validation
             self.val_dataloader = self._val_dataloader
         if test is not None:
@@ -162,6 +180,7 @@ class DataModuleFromConfig(pl.LightningDataModule):
         self.wrap = wrap
 
     def prepare_data(self):
+        print(f"self.dataset_configs: {self.dataset_configs}")
         for data_cfg in self.dataset_configs.values():
             instantiate_from_config(data_cfg)
 
@@ -550,8 +569,6 @@ if __name__ == '__main__':
     parser = get_parser()
     parser = Trainer.add_argparse_args(parser)
 
-    print(f"argparser: {parser}")
-
     opt, unknown = parser.parse_known_args()
     if opt.name and opt.resume:
         raise ValueError(
@@ -710,8 +727,12 @@ if __name__ == '__main__':
 
         trainer = Trainer.from_argparse_args(trainer_opt, **trainer_kwargs)
 
+        print(f'trainer: {trainer}')
+        print(f"config: {config}")
+
         # data
         data = instantiate_from_config(config.data)
+        print(f"data: {data}")
         # NOTE according to https://pytorch-lightning.readthedocs.io/en/latest/datamodules.html
         # calling these ourselves should not be necessary but it is.
         # lightning still takes care of proper multiprocessing though

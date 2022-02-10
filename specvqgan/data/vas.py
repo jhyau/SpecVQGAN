@@ -88,22 +88,30 @@ class ResampleFrames(object):
 
 class VASSpecs(torch.utils.data.Dataset):
 
-    def __init__(self, split, spec_dir_path, mel_num=None, spec_len=None, spec_crop_len=None,
+    def __init__(self, split, spec_dir_path, dataset_type='vas', mel_num=None, spec_len=None, spec_crop_len=None,
                  random_crop=None, crop_coord=None, for_which_class=None, split_path=None):
         super().__init__()
         self.split = split
         self.spec_dir_path = spec_dir_path
-        
-        print(f"split: {self.split}")
+        self.dataset_type = dataset_type
+        print(f"split: {self.split}, dataset type: {dataset_type}")
 
         # fixing split_path in here because of compatibility with vggsound which hangles it in vggishish
         #self.split_path = f'./data/vas_{split}.txt'
         if split == 'train':
-            #self.split_path = f"/juno/u/jyau/regnet/filelists/dog_train.txt"
-            self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_train.txt"
+            if dataset_type == 'vas':
+                self.split_path = f"/juno/u/jyau/regnet/filelists/dog_train.txt"
+            elif dataset_type == 'asmr':
+                self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_train.txt"
+            else:
+                raise Exception("dataset type doesn't exist")
         elif split == 'valid':
-            #self.split_path = f"/juno/u/jyau/regnet/filelists/dog_test.txt"
-            self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_test.txt"
+            if dataset_type == 'vas':
+                self.split_path = f"/juno/u/jyau/regnet/filelists/dog_test.txt"
+            elif dataset_type == 'asmr':
+                self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_test.txt"
+            else:
+                raise Exception
         self.feat_suffix = '_mel.npy'
         
         print(f"spec_dir_path: {self.spec_dir_path}")
@@ -124,14 +132,19 @@ class VASSpecs(torch.utils.data.Dataset):
         print(f"dataset example: {self.dataset[0]}")
 
         # Use this line for getting classes for regnet VAS
-        #unique_classes = sorted(list(set([spec_dir_path.split('/')[-2]])))
+        if dataset_type == 'vas':
+            labs = [x for x in spec_dir_path.split('/') if x]
+            unique_classes = sorted(list(set([labs[-2]])))
+            print(spec_dir_path.split('/'))
+        elif dataset_type == 'asmr':
+            #unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
 
-        #unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
+            # Use this line for getting classes for asmr_by_material clips
+            unique_classes = sorted(list(set([self.__get_label__(cls_vid) for cls_vid in self.dataset])))
+        else:
+            raise Exception("wrong dataset type")
 
-        # Use this line for getting classes for asmr_by_material clips
-        unique_classes = sorted(list(set([self.__get_label__(cls_vid) for cls_vid in self.dataset])))
         self.label2target = {label: target for target, label in enumerate(unique_classes)}
-
         print(f"unique classes: {unique_classes}")
 
         self.transforms = CropImage([mel_num, spec_crop_len], random_crop)
@@ -164,16 +177,21 @@ class VASSpecs(torch.utils.data.Dataset):
         #cls, vid = self.dataset[idx].split('/')
 
         # Use this when training on regnet's VAS
-        #cls = self.spec_dir_path.split('/')[-2]
+        if self.dataset_type == 'vas':
+            labs = [x for x in self.spec_dir_path.split('/') if x]
+            cls = labs[-2]
         #spec_path = os.path.join(self.spec_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
+        
         vid = self.dataset[idx]
         spec_path = os.path.join(self.spec_dir_path, f'{vid}{self.feat_suffix}')
 
         spec = np.load(spec_path)
         item['input'] = spec
         item['file_path_'] = spec_path
-
-        cls = self.__get_label__(vid)
+        
+        if self.dataset_type == 'asmr':
+            cls = self.__get_label__(vid)
+        
         item['label'] = cls
         item['target'] = self.label2target[cls]
 
@@ -193,14 +211,17 @@ class VASSpecs(torch.utils.data.Dataset):
 
 class VASSpecsTrain(VASSpecs):
     def __init__(self, specs_dataset_cfg):
+        print(f"specs_dataset_cfg: {specs_dataset_cfg}")
         super().__init__('train', **specs_dataset_cfg)
 
 class VASSpecsValidation(VASSpecs):
     def __init__(self, specs_dataset_cfg):
+        print(f"specs_dataset_cfg: {specs_dataset_cfg}")
         super().__init__('valid', **specs_dataset_cfg)
 
 class VASSpecsTest(VASSpecs):
     def __init__(self, specs_dataset_cfg):
+        print(f"specs_dataset_cfg: {specs_dataset_cfg}")
         super().__init__('test', **specs_dataset_cfg)
 
 
