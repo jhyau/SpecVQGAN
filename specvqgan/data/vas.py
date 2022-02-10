@@ -88,7 +88,7 @@ class ResampleFrames(object):
 
 class VASSpecs(torch.utils.data.Dataset):
 
-    def __init__(self, split, spec_dir_path, dataset_type='asmr', mel_num=None, spec_len=None, spec_crop_len=None,
+    def __init__(self, split, spec_dir_path, dataset_type='vas', mel_num=None, spec_len=None, spec_crop_len=None,
                  random_crop=None, crop_coord=None, for_which_class=None, split_path=None):
         super().__init__()
         self.split = split
@@ -227,7 +227,7 @@ class VASSpecsTest(VASSpecs):
 class VASFeats(torch.utils.data.Dataset):
 
     def __init__(self, split, rgb_feats_dir_path, flow_feats_dir_path, feat_len, feat_depth, feat_crop_len,
-                 replace_feats_with_random, random_crop, split_path, for_which_class, feat_sampler_cfg, dataset_type='asmr'):
+                 replace_feats_with_random, random_crop, split_path, for_which_class, feat_sampler_cfg, dataset_type='vas'):
         super().__init__()
         self.split = split
         self.rgb_feats_dir_path = rgb_feats_dir_path
@@ -256,7 +256,9 @@ class VASFeats(torch.utils.data.Dataset):
         if self.dataset_type == 'asmr':
             unique_classes = sorted(list(set([self.__get_label__(cls_vid) for cls_vid in self.dataset])))
         elif self.dataset_type == 'vas':
-            unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
+            labs = [x for x in rgb_feats_dir_path.split('/') if x]
+            unique_classes = sorted(list(set([labs[-2]])))
+            #unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
         else:
             raise Exception("Wrong dataset type")
         self.label2target = {label: target for target, label in enumerate(unique_classes)}
@@ -294,18 +296,13 @@ class VASFeats(torch.utils.data.Dataset):
         item = dict()
 
         if self.dataset_type == 'vas':
-            cls, vid = self.dataset[idx].split('/')
-        elif self.dataset_type == 'asmr':
-            vid = self.dataset[idx]
-        else:
-            raise Exception("wrong dataset type")
+            labs = [x for x in self.flow_feats_dir_path.split('/') if x]
+            cls = labs[-2]
+            #cls, vid = self.dataset[idx].split('/')
+        vid = self.dataset[idx]
 
-        if self.dataset_type == 'vas':
-            rgb_path = os.path.join(self.rgb_feats_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
-        elif self.dataset_type == 'asmr':
-            rgb_path = os.path.join(self.rgb_feats_dir_path, f'{vid}{self.feat_suffix}')
-        else:
-            raise Exception("wrong dataset type")
+        #rgb_path = os.path.join(self.rgb_feats_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
+        rgb_path = os.path.join(self.rgb_feats_dir_path, f'{vid}{self.feat_suffix}')
 
         # just a dummy random features acting like a fake interface for no features experiment
         if self.replace_feats_with_random:
@@ -317,12 +314,8 @@ class VASFeats(torch.utils.data.Dataset):
 
         # also preprocess flow
         if self.flow_feats_dir_path is not None:
-            if self.dataset_type == 'vas':
-                flow_path = os.path.join(self.flow_feats_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
-            elif self.dataset_type == 'asmr':
-                flow_path = os.path.join(self.flow_feats_dir_path, f'{vid}{self.feat_suffix}')
-            else:
-                raise Exception("wrong dataset type")
+            #flow_path = os.path.join(self.flow_feats_dir_path.replace('*', cls), f'{vid}{self.feat_suffix}')
+            flow_path = os.path.join(self.flow_feats_dir_path, f'{vid}{self.feat_suffix}')
 
             # just a dummy random features acting like a fake interface for no features experiment
             if self.replace_feats_with_random:
@@ -340,6 +333,7 @@ class VASFeats(torch.utils.data.Dataset):
        
         if self.dataset_type == 'asmr':
             cls = self.__get_label__(vid)
+        
         item['label'] = cls
         item['target'] = self.label2target[cls]
 

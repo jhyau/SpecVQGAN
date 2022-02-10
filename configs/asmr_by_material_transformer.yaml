@@ -23,7 +23,7 @@ model:
       target: specvqgan.modules.transformer.permuter.ColumnMajor
       params:
         H: 5  # mel_num, num of feats in specs / down_factor
-        W: 53  # cropped spec length / down_factor
+        W: 107  # cropped spec length / down_factor  down_factor=16
     first_stage_config:
       target: specvqgan.models.vqgan.VQModel
       params:
