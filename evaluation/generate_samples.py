@@ -222,7 +222,7 @@ def sample_spectrogram(cfg, model, batch):
         return z_pred_img
 
 
-def save_specs(cfg, specs, samples_split_dirs, model, batch, split, sample_id, vocoder):
+def save_specs(cfg, specs, samples_split_dirs, model, batch, split, sample_id, vocoder, file):
     if isinstance(model, torch.nn.parallel.DistributedDataParallel):
         # model_ddp = model
         model = model.module
@@ -259,7 +259,9 @@ def save_specs(cfg, specs, samples_split_dirs, model, batch, split, sample_id, v
         sanity = save_path / f'{vidname}_sample_{sample_id}.npy'
         print(f"Saving the sampled spectrograms... {sanity}")
         np.save(save_path / f'{vidname}_sample_{sample_id}.npy', spec)
+        file.write(str(sanity) + '\n')
         if vocoder is not None:
+            # NOTE: Try passing the waveglow method mel spectrograms through waveglow as vocoder instead of the pretrained melgan!
             print("Passed through vocoder to get audio...")
             wave_from_vocoder = vocoder(torch.from_numpy(spec).unsqueeze(0).to('cuda')).cpu().squeeze().detach().numpy()
             print(save_path / f'{vidname}_sample_{sample_id}.wav')
@@ -280,11 +282,13 @@ def sample(gpu_id, cfg, samples_split_dirs, is_ddp):
     else:
         samples_per_video = 1
 
+    print(f"Num dataloaders: {len(dataloaders)}")
     for split, dataloader in dataloaders.items():
+        file = open(os.path.join(samples_split_dirs[split], 'mel_files.txt'), 'w')
         for batch in tqdm(dataloader):
             for sample_id in range(samples_per_video):
                 specs = sample_spectrogram(cfg, model, batch)
-                save_specs(cfg, specs, samples_split_dirs, model, batch, split, sample_id, vocoder)
+                save_specs(cfg, specs, samples_split_dirs, model, batch, split, sample_id, vocoder, file)
 
 def main():
     torch.manual_seed(0)
