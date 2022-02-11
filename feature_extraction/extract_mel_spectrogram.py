@@ -163,7 +163,7 @@ def inv_transforms(x, folder_name='melspec_10s_22050hz'):
     return i_transforms(x)
 
 
-def get_spectrogram(audio_path, save_dir, length, folder_name='melspec_10s_22050hz', save_results=True):
+def get_spectrogram(audio_path, save_dir, length, sr, folder_name='melspec_10s_22050hz', save_results=True):
     wav, _ = librosa.load(audio_path, sr=None)
     # this cannot be a transform without creating a huge overhead with inserting audio_name in each
     y = np.zeros(length)
@@ -184,6 +184,7 @@ def get_spectrogram(audio_path, save_dir, length, folder_name='melspec_10s_22050
         np.save(P.join(save_dir, audio_name + '_mel.npy'), mel_spec)
         np.save(P.join(save_dir, audio_name + '_audio.npy'), y)
     else:
+        print(mel_spec.shape)
         return y, mel_spec
 
 

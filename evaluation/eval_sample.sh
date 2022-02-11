@@ -1,7 +1,8 @@
 # Path to experiment
 #EXPERIMENT_PATH=./logs/2021-06-09T15-17-18_vas_transformer
-EXPERIMENT_PATH=./logs/2021-12-11T17-05-22_asmr_by_material_transformer
+#EXPERIMENT_PATH=./logs/2021-12-11T17-05-22_asmr_by_material_transformer
 #EXPERIMENT_PATH=./logs/2021-11-30T07-58-56_asmr_by_material_codebook
+EXPERIMENT_PATH=./logs/2022-02-10T21-45-30_asmr_by_material_transformer
 
 # Select a dataset here
 DATASET="VAS"
@@ -30,7 +31,7 @@ elif [[ "$DATASET" == "VAS" ]]; then
     SPEC_DIR_PATH="/juno/u/jyau/regnet/data/features/ASMR/orig_asmr_by_material_clips/melspec_10s_44100hz/"
     RGB_FEATS_DIR_PATH="/juno/u/jyau/regnet/data/features/ASMR/orig_asmr_by_material_clips/feature_rgb_bninception_dim1024_21.5fps"
     FLOW_FEATS_DIR_PATH="/juno/u/jyau/regnet/data/features/ASMR/orig_asmr_by_material_clips/feature_flow_bninception_dim1024_21.5fps"
-    SAMPLES_FOLDER="asmr_by_material_validation"
+    SAMPLES_FOLDER="asmr_by_material_validation_transformer"
     #SPLITS="\"[validation, ]\""
     SAMPLER_BATCHSIZE=4
     SAMPLES_PER_VIDEO=$VAS_SAMPLES_PER_VIDEO

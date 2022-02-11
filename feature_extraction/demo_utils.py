@@ -201,9 +201,12 @@ def load_codebook(model_dir, log_dir, device):
     melception = load_feature_extractor(to_use_gpu, eval_mode=True)
     return config, sampler, melgan, melception
 
-def load_model(model_name, log_dir, device):
+def load_model(model_name, log_dir, device, download=False):
     to_use_gpu = True if device.type == 'cuda' else False
-    model_dir = maybe_download_model(model_name, log_dir)
+    if download:
+        model_dir = maybe_download_model(model_name, log_dir)
+    else:
+        model_dir = model_name
     config = load_config(model_dir)
 
     # Sampling model
@@ -361,7 +364,9 @@ def extract_melspectrogram(in_path: str, sr: int, duration: int = 10, tmp_path: 
     subprocess.call(cmd.split())
 
     length = int(duration * sr)
-    audio_zero_pad, spec = get_spectrogram(audio_new, save_dir=None, length=length, save_results=False)
+    print(f"duration: {duration}, sr: {sr}, length: {length}")
+    audio_zero_pad, spec = get_spectrogram(audio_new, save_dir=None, length=length, sr=sr, save_results=False)
+    print("spec length: ", spec.shape)
 
     # specvqgan expects inputs to be in [-1, 1] but spectrograms are in [0, 1]
     spec = 2 * spec - 1
