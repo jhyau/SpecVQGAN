@@ -15,7 +15,7 @@ model:
             padding: 0
         GPT_config:
           vocab_size: 128
-          block_size: 477  # 53*5 + 212
+          block_size: 747  # 107*5 + 212=747  # 477= 53*5 + 212 =  53*3 + how many frames
           n_layer: 24
           n_head: 16
           n_embd: 1024
@@ -23,7 +23,7 @@ model:
       target: specvqgan.modules.transformer.permuter.ColumnMajor
       params:
         H: 5  # mel_num, num of feats in specs / down_factor
-        W: 107  # cropped spec length / down_factor  down_factor=16
+        W: 107  # 53 cropped spec length / down_factor  down_factor=16
     first_stage_config:
       target: specvqgan.models.vqgan.VQModel
       params:
