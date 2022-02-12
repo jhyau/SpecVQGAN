@@ -21,6 +21,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--save_path", required=True)
     parser.add_argument("--load_path", default=None)
+    parser.add_argument("--sampling_rate", type=int, default=44100)
+    parser.add_argument("--data_split_file_name", type=str)
 
     parser.add_argument("--n_mel_channels", type=int, default=80)
     parser.add_argument("--ngf", type=int, default=32)
@@ -85,13 +87,13 @@ def main():
     # Create data loaders #
     #######################
     train_set = AudioDataset(
-        Path(args.data_path), Path(args.splits_path) / 'vggsound_train.txt', args.seq_len, sampling_rate=22050
+        Path(args.data_path), Path(args.splits_path) / f'{args.data_split_file_name}_train.txt', args.seq_len, sampling_rate=args.sampling_rate
     )
     test_set = AudioDataset(
         Path(args.data_path),
-        Path(args.splits_path) / 'vggsound_test.txt',
-        22050 * 10,
-        sampling_rate=22050,
+        Path(args.splits_path) / f'{args.data_split_file_name}_test.txt',
+        args.sampling_rate * 10,
+        sampling_rate=args.sampling_rate,
         augment=False,
     )
 
@@ -111,8 +113,8 @@ def main():
         test_audio.append(x_t)
 
         audio = x_t.squeeze().cpu()
-        save_sample(root / f'original_{i}.wav', 22050, audio)
-        writer.add_audio(f'original/sample_{i}.wav', audio, 0, sample_rate=22050)
+        save_sample(root / f'original_{i}.wav', args.sampling_rate, audio)
+        writer.add_audio(f'original/sample_{i}.wav', audio, 0, sample_rate=args.sampling_rate)
 
         if i == args.n_test_samples - 1:
             break
@@ -193,12 +195,12 @@ def main():
                     for i, (voc, _) in enumerate(zip(test_voc, test_audio)):
                         pred_audio = netG(voc)
                         pred_audio = pred_audio.squeeze().cpu()
-                        save_sample(root / ("generated_%d.wav" % i), 22050, pred_audio)
+                        save_sample(root / ("generated_%d.wav" % i), args.sampling_rate, pred_audio)
                         writer.add_audio(
                             "generated/sample_%d.wav" % i,
                             pred_audio,
                             epoch,
-                            sample_rate=22050,
+                            sample_rate=args.sampling_rate,
                         )
 
                 torch.save(netG.state_dict(), root / "netG.pt")
