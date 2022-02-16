@@ -62,7 +62,7 @@ lightning:
         vocoder_cfg:
           target: train.VocoderMelGan
           params:
-            ckpt_vocoder: './vocoder/logs/asmr_by_material/'
+            ckpt_vocoder: './vocoder/logs/asmr-by-material/'
     early_stop_callback:
       target: pytorch_lightning.callbacks.EarlyStopping
       params:

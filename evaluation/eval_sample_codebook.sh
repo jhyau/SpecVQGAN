@@ -31,7 +31,7 @@ elif [[ "$DATASET" == "VAS" ]]; then
     SPEC_DIR_PATH="/juno/u/jyau/regnet/data/features/ASMR/orig_asmr_by_material_clips/melspec_10s_44100hz/"
     RGB_FEATS_DIR_PATH="/juno/u/jyau/regnet/data/features/ASMR/orig_asmr_by_material_clips/feature_rgb_bninception_dim1024_21.5fps"
     FLOW_FEATS_DIR_PATH="/juno/u/jyau/regnet/data/features/ASMR/orig_asmr_by_material_clips/feature_flow_bninception_dim1024_21.5fps"
-    SAMPLES_FOLDER="asmr_by_material_validation_retry"
+    SAMPLES_FOLDER="asmr_by_material_validation_melgan"
     #SPLITS="\"[validation, ]\""
     SAMPLER_BATCHSIZE=4
     SAMPLES_PER_VIDEO=$VAS_SAMPLES_PER_VIDEO
@@ -40,6 +40,7 @@ else
     exit
 fi
 
+# To change the output directory (save_path) for generated audio, change the NOW string
 NOW="eval"
 # Some info to print
 echo "Local Scratch" $LOCAL_SCRATCH

@@ -37,7 +37,7 @@ lightning:
         vocoder_cfg:
           target: train.VocoderMelGan
           params:
-            ckpt_vocoder: './vocoder/logs/asmr_by_material/'
+            ckpt_vocoder: './vocoder/logs/asmr-by-material/'
   trainer:
     sync_batchnorm: true
 
