@@ -41,7 +41,7 @@ else
 fi
 
 # To change the output directory (save_path) for generated audio, change the NOW string
-NOW="eval"
+NOW="melgan_asmr_ver2"
 # Some info to print
 echo "Local Scratch" $LOCAL_SCRATCH
 echo "Hostlist:" $HOSTLIST

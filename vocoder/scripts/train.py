@@ -50,6 +50,7 @@ def parse_args():
 
 def main():
     args = parse_args()
+    print(f"args: \n {args}")
 
     root = Path(args.save_path)
     load_root = Path(args.load_path) if args.load_path else None
@@ -78,6 +79,7 @@ def main():
     optD = torch.optim.Adam(netD.parameters(), lr=1e-4, betas=(0.5, 0.9))
 
     if load_root and load_root.exists():
+        print(f"Using loaded states from: {load_root}")
         netG.load_state_dict(torch.load(load_root / "netG.pt"))
         optG.load_state_dict(torch.load(load_root / "optG.pt"))
         netD.load_state_dict(torch.load(load_root / "netD.pt"))
@@ -125,6 +127,7 @@ def main():
     # enable cudnn autotuner to speed up training
     torch.backends.cudnn.benchmark = True
 
+    print(f"Training for {args.epochs} epochs...")
     best_mel_reconst = 1000000
     steps = 0
     for epoch in range(1, args.epochs + 1):

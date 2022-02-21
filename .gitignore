@@ -1,3 +1,5 @@
 __pycache__
 specvqgan/modules/
 *.out
+*.wav
+*.txt

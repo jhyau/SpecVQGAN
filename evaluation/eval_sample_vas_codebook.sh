@@ -41,7 +41,7 @@ else
     exit
 fi
 
-NOW="eval"
+NOW="eval_with_melgan"
 # Some info to print
 echo "Local Scratch" $LOCAL_SCRATCH
 echo "Hostlist:" $HOSTLIST

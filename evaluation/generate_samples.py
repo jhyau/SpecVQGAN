@@ -265,7 +265,10 @@ def save_specs(cfg, specs, samples_split_dirs, model, batch, split, sample_id, v
             print("Passed through vocoder to get audio...")
             wave_from_vocoder = vocoder(torch.from_numpy(spec).unsqueeze(0).to('cuda')).cpu().squeeze().detach().numpy()
             print(save_path / f'{vidname}_sample_{sample_id}.wav')
+            
             # Original audio sample rate: 22050
+            #audio = wave_from_vocoder * 32768 # Based on the save_sample function in vocoder mel2wav
+            #save_sample(save_path / f'{vidname}_sample_{sample_id}.wav', int(cfg.data.params.sample_rate), wave_from_vocoder)
             soundfile.write(save_path / f'{vidname}_sample_{sample_id}.wav', wave_from_vocoder, int(cfg.data.params.sample_rate), 'PCM_24')
 
 
