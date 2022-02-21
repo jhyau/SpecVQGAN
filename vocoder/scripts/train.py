@@ -41,9 +41,11 @@ def parse_args():
     parser.add_argument("--seq_len", type=int, default=8192)
 
     parser.add_argument("--epochs", type=int, default=100000)
+    parser.add_argument("--resume_epochs", type=int, default=None)
     parser.add_argument("--log_interval", type=int, default=100)
     parser.add_argument("--save_interval", type=int, default=1000)
     parser.add_argument("--n_test_samples", type=int, default=8)
+    parser.add_argument("--waveglow_training", action="store_true", help="Use flag to indicate using waveglow-style mel spectrograms")
     args = parser.parse_args()
     return args
 
@@ -107,9 +109,13 @@ def main():
     ##########################
     test_voc = []
     test_audio = []
-    for i, x_t in enumerate(test_loader):
+    for i, (x_t, mel_t) in enumerate(test_loader):
         x_t = x_t.cuda()
-        s_t = wav2mel(x_t)
+        if args.waveglow_training:
+            print('Using loaded mel spectrograms...')
+            s_t = mel_t
+        else:
+            s_t = wav2mel(x_t)
 
         test_voc.append(s_t.cuda())
         test_audio.append(x_t)
@@ -130,13 +136,25 @@ def main():
     print(f"Training for {args.epochs} epochs...")
     best_mel_reconst = 1000000
     steps = 0
-    for epoch in range(1, args.epochs + 1):
-        for iterno, x_t in enumerate(train_loader):
+
+    # Resume epoch
+    if args.resume_epochs:
+        start = args.resume_epochs
+    else:
+        start = 1
+
+    for epoch in range(start, args.epochs + 1):
+        for iterno, (x_t, mel_t) in enumerate(train_loader):
             x_t = x_t.cuda()
             # librosa mel spec extraction returns weird length of specs. Therefore, we need to crop them
             # 256 = hoplen
             trim_len = x_t.shape[-1] // 256
-            s_t = wav2mel(x_t.squeeze(1), trim_len)
+            
+            if args.waveglow_training:
+                print('Using loaded mel spectrograms in training...')
+                s_t = mel_t
+            else:
+                s_t = wav2mel(x_t.squeeze(1), trim_len)
             x_pred_t = netG(s_t.cuda())
 
             with torch.no_grad():

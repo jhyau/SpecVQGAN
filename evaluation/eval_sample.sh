@@ -2,7 +2,8 @@
 #EXPERIMENT_PATH=./logs/2021-06-09T15-17-18_vas_transformer
 #EXPERIMENT_PATH=./logs/2021-12-11T17-05-22_asmr_by_material_transformer
 #EXPERIMENT_PATH=./logs/2021-11-30T07-58-56_asmr_by_material_codebook
-EXPERIMENT_PATH=./logs/2022-02-10T21-45-30_asmr_by_material_transformer
+#EXPERIMENT_PATH=./logs/2022-02-10T21-45-30_asmr_by_material_transformer
+EXPERIMENT_PATH=./logs/2022-02-19T06-10-59_asmr_by_material_transformer_no_early_stop
 
 # Select a dataset here
 DATASET="VAS"
@@ -40,7 +41,7 @@ else
     exit
 fi
 
-NOW="eval"
+NOW="eval_init"
 # Some info to print
 echo "Local Scratch" $LOCAL_SCRATCH
 echo "Hostlist:" $HOSTLIST

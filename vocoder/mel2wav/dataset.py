@@ -17,8 +17,9 @@ def files_to_list(filename, data_root):
     with open(filename, encoding="utf-8") as f:
         files = f.readlines()
 
+    mel_files = [data_root / f'{f.rstrip()}_mel.npy' for f in files]
     files = [data_root / f'{f.rstrip()}_audio.npy' for f in files]
-    return files
+    return files, mel_files
 
 
 class AudioDataset(torch.utils.data.Dataset):
@@ -30,7 +31,7 @@ class AudioDataset(torch.utils.data.Dataset):
     def __init__(self, data_root, split_path, segment_length, sampling_rate, augment=True):
         self.sampling_rate = sampling_rate
         self.segment_length = segment_length
-        self.audio_files = files_to_list(split_path, data_root)
+        self.audio_files, self.mel_files = files_to_list(split_path, data_root)
         # self.audio_files = [Path(training_files).parent / x for x in self.audio_files]
         random.seed(1234)
         random.shuffle(self.audio_files)
@@ -39,6 +40,8 @@ class AudioDataset(torch.utils.data.Dataset):
     def __getitem__(self, index):
         # Read audio
         filename = self.audio_files[index]
+        mel_spec_filename = self.mel_files[index]
+        #print(f"audio file name: {filename} and mel spec file name: {mel_spec_filename}")
         audio, sampling_rate = self.load_wav_to_torch(filename)
         # Take segment
         if audio.size(0) >= self.segment_length:
@@ -51,9 +54,14 @@ class AudioDataset(torch.utils.data.Dataset):
             ).data
 
         # audio = audio / 32768.0
-        return audio.unsqueeze(0)
+
+        # Get the corresponding mel spectrogram
+        mel_spec = np.load(mel_spec_filename)
+
+        return audio.unsqueeze(0), mel_spec
 
     def __len__(self):
+        assert(len(self.audio_files) == len(self.mel_files))
         return len(self.audio_files)
 
     def load_wav_to_torch(self, full_path):
