@@ -116,7 +116,8 @@ def main():
             s_t = mel_t
         else:
             s_t = wav2mel(x_t)
-
+            
+        print(f"size of testing mel spec: {s_t.size()}")
         test_voc.append(s_t.cuda())
         test_audio.append(x_t)
 
@@ -149,14 +150,16 @@ def main():
             # librosa mel spec extraction returns weird length of specs. Therefore, we need to crop them
             # 256 = hoplen
             trim_len = x_t.shape[-1] // 256
+            print(f"audio length: {x_t.size()}, trim len: {trim_len}")
             
             if args.waveglow_training:
                 print('Using loaded mel spectrograms in training...')
-                s_t = mel_t
+                s_t = mel_t[:, :, :trim_len]
             else:
                 s_t = wav2mel(x_t.squeeze(1), trim_len)
             x_pred_t = netG(s_t.cuda())
-
+            
+            print(f"size of training mel spec: {s_t.size()}")
             with torch.no_grad():
                 s_pred_t = wav2mel(x_pred_t.squeeze(1).detach().cpu(), trim_len)
                 s_error = F.l1_loss(s_t, s_pred_t).item()
