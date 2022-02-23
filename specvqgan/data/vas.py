@@ -88,7 +88,7 @@ class ResampleFrames(object):
 
 class VASSpecs(torch.utils.data.Dataset):
 
-    def __init__(self, split, spec_dir_path, dataset_type='asmr', mel_num=None, spec_len=None, spec_crop_len=None,
+    def __init__(self, split, spec_dir_path, dataset_type='asmr_1hr', mel_num=None, spec_len=None, spec_crop_len=None,
                  random_crop=None, crop_coord=None, for_which_class=None, split_path=None):
         super().__init__()
         self.split = split
@@ -103,13 +103,17 @@ class VASSpecs(torch.utils.data.Dataset):
                 self.split_path = f"/juno/u/jyau/regnet/filelists/dog_train.txt"
             elif dataset_type == 'asmr':
                 self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_train.txt"
+            elif dataset_type == 'asmr_1hr':
+                self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_1hr_train.txt"
             else:
                 raise Exception("dataset type doesn't exist")
         elif split == 'valid':
             if dataset_type == 'vas':
                 self.split_path = f"/juno/u/jyau/regnet/filelists/dog_test.txt"
             elif dataset_type == 'asmr':
-                self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_test.txt"
+                self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_test.txti"
+            elif dataset_type == 'asmr_1hr':
+                self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_1hr_test.txt"
             else:
                 raise Exception
         self.feat_suffix = '_mel.npy'
@@ -136,7 +140,7 @@ class VASSpecs(torch.utils.data.Dataset):
             labs = [x for x in spec_dir_path.split('/') if x]
             unique_classes = sorted(list(set([labs[-2]])))
             print(spec_dir_path.split('/'))
-        elif dataset_type == 'asmr':
+        elif dataset_type.find('asmr') != -1:
             #unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
             # Use this line for getting classes for asmr_by_material clips
             unique_classes = sorted(list(set([self.__get_label__(cls_vid) for cls_vid in self.dataset])))
@@ -188,7 +192,7 @@ class VASSpecs(torch.utils.data.Dataset):
         item['input'] = spec
         item['file_path_'] = spec_path
         
-        if self.dataset_type == 'asmr':
+        if self.dataset_type.find('asmr') != -1:
             cls = self.__get_label__(vid)
         
         item['label'] = cls
@@ -227,7 +231,7 @@ class VASSpecsTest(VASSpecs):
 class VASFeats(torch.utils.data.Dataset):
 
     def __init__(self, split, rgb_feats_dir_path, flow_feats_dir_path, feat_len, feat_depth, feat_crop_len,
-                 replace_feats_with_random, random_crop, split_path, for_which_class, feat_sampler_cfg, dataset_type='asmr'):
+                 replace_feats_with_random, random_crop, split_path, for_which_class, feat_sampler_cfg, dataset_type='asmr_1hr'):
         super().__init__()
         self.split = split
         self.rgb_feats_dir_path = rgb_feats_dir_path
@@ -253,7 +257,7 @@ class VASFeats(torch.utils.data.Dataset):
             self.dataset = full_dataset
 
         print(f"dataset example: {self.dataset[0]}")
-        if self.dataset_type == 'asmr':
+        if self.dataset_type.find('asmr') != -1:
             unique_classes = sorted(list(set([self.__get_label__(cls_vid) for cls_vid in self.dataset])))
         elif self.dataset_type == 'vas':
             labs = [x for x in rgb_feats_dir_path.split('/') if x]
@@ -331,7 +335,7 @@ class VASFeats(torch.utils.data.Dataset):
         feats_padded[:feats.shape[0], :] = feats[:self.feat_len, :]
         item['feature'] = feats_padded
        
-        if self.dataset_type == 'asmr':
+        if self.dataset_type.find('asmr') != -1:
             cls = self.__get_label__(vid)
         
         item['label'] = cls
