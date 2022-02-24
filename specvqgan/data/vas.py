@@ -88,7 +88,7 @@ class ResampleFrames(object):
 
 class VASSpecs(torch.utils.data.Dataset):
 
-    def __init__(self, split, spec_dir_path, dataset_type='asmr_1hr', mel_num=None, spec_len=None, spec_crop_len=None,
+    def __init__(self, split, spec_dir_path, dataset_type='asmr_ceramic', mel_num=None, spec_len=None, spec_crop_len=None,
                  random_crop=None, crop_coord=None, for_which_class=None, split_path=None):
         super().__init__()
         self.split = split
@@ -105,6 +105,8 @@ class VASSpecs(torch.utils.data.Dataset):
                 self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_train.txt"
             elif dataset_type == 'asmr_1hr':
                 self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_1hr_train.txt"
+            elif dataset_type == 'asmr_ceramic':
+                self.split_path = f'/juno/u/jyau/regnet/filelists/ceramic_train.txt'
             else:
                 raise Exception("dataset type doesn't exist")
         elif split == 'valid':
@@ -114,6 +116,8 @@ class VASSpecs(torch.utils.data.Dataset):
                 self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_test.txti"
             elif dataset_type == 'asmr_1hr':
                 self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_1hr_test.txt"
+            elif dataset_type == 'asmr_ceramic':
+                self.split_path = f'/juno/u/jyau/regnet/filelists/ceramic_test.txt'
             else:
                 raise Exception
         self.feat_suffix = '_mel.npy'
@@ -231,7 +235,7 @@ class VASSpecsTest(VASSpecs):
 class VASFeats(torch.utils.data.Dataset):
 
     def __init__(self, split, rgb_feats_dir_path, flow_feats_dir_path, feat_len, feat_depth, feat_crop_len,
-                 replace_feats_with_random, random_crop, split_path, for_which_class, feat_sampler_cfg, dataset_type='asmr_1hr'):
+                 replace_feats_with_random, random_crop, split_path, for_which_class, feat_sampler_cfg, dataset_type='asmr_ceramic'):
         super().__init__()
         self.split = split
         self.rgb_feats_dir_path = rgb_feats_dir_path
@@ -244,6 +248,7 @@ class VASFeats(torch.utils.data.Dataset):
         self.feat_sampler_cfg = feat_sampler_cfg
         self.replace_feats_with_random = replace_feats_with_random
         self.dataset_type = dataset_type
+        print(f"split path: {split_path}")
 
         if not os.path.exists(split_path):
             print(f'split does not exist in {split_path}. Creating new ones...')
