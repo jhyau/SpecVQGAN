@@ -732,7 +732,6 @@ if __name__ == '__main__':
 
         # data
         data = instantiate_from_config(config.data)
-        print(f"data: {data}")
         # NOTE according to https://pytorch-lightning.readthedocs.io/en/latest/datamodules.html
         # calling these ourselves should not be necessary but it is.
         # lightning still takes care of proper multiprocessing though

@@ -3,7 +3,8 @@
 #EXPERIMENT_PATH=./logs/2021-12-11T17-05-22_asmr_by_material_transformer
 #EXPERIMENT_PATH=./logs/2021-11-30T07-58-56_asmr_by_material_codebook
 #EXPERIMENT_PATH=./logs/2022-02-10T21-45-30_asmr_by_material_transformer
-EXPERIMENT_PATH=./logs/2022-02-19T06-10-59_asmr_by_material_transformer_no_early_stop
+#EXPERIMENT_PATH=./logs/2022-02-19T06-10-59_asmr_by_material_transformer_no_early_stop
+EXPERIMENT_PATH=./logs/2022-02-23T07-48-24_asmr_by_material_1hr_transformer_no_early_stop
 
 # Select a dataset here
 DATASET="VAS"
@@ -41,11 +42,13 @@ else
     exit
 fi
 
-NOW="eval_init"
+NOW="eval_best_val"
+CKPT="best"
 # Some info to print
 echo "Local Scratch" $LOCAL_SCRATCH
 echo "Hostlist:" $HOSTLIST
 echo "Samples per video:" $SAMPLES_PER_VIDEO "; Sampler path" $EXPERIMENT_PATH
+echo "Checkpoint: " $CKPT
 echo $EXTRACT_FILES_CMD
 echo $SPEC_DIR_PATH
 echo $RGB_FEATS_DIR_PATH
@@ -68,6 +71,7 @@ python -m torch.distributed.launch \
         sampler.samples_per_video=$SAMPLES_PER_VIDEO \
         sampler.batch_size=$SAMPLER_BATCHSIZE \
         sampler.top_k=$TOP_K \
+	sampler.ckpt=$CKPT\
         data.params.spec_dir_path=$SPEC_DIR_PATH \
         data.params.rgb_feats_dir_path=$RGB_FEATS_DIR_PATH \
         data.params.flow_feats_dir_path=$FLOW_FEATS_DIR_PATH \
