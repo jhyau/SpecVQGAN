@@ -4,7 +4,8 @@
 #EXPERIMENT_PATH=./logs/2021-11-30T07-58-56_asmr_by_material_codebook
 #EXPERIMENT_PATH=./logs/2022-02-10T21-45-30_asmr_by_material_transformer
 #EXPERIMENT_PATH=./logs/2022-02-19T06-10-59_asmr_by_material_transformer_no_early_stop
-EXPERIMENT_PATH=./logs/2022-02-23T07-48-24_asmr_by_material_1hr_transformer_no_early_stop
+#EXPERIMENT_PATH=./logs/2022-02-23T07-48-24_asmr_by_material_1hr_transformer_no_early_stop
+EXPERIMENT_PATH=./logs/2022-02-24T05-38-23_ceramic_transformer_no_early_stop
 
 # Select a dataset here
 DATASET="VAS"
@@ -33,7 +34,7 @@ elif [[ "$DATASET" == "VAS" ]]; then
     SPEC_DIR_PATH="/juno/u/jyau/regnet/data/features/ASMR/orig_asmr_by_material_clips/melspec_10s_44100hz/"
     RGB_FEATS_DIR_PATH="/juno/u/jyau/regnet/data/features/ASMR/orig_asmr_by_material_clips/feature_rgb_bninception_dim1024_21.5fps"
     FLOW_FEATS_DIR_PATH="/juno/u/jyau/regnet/data/features/ASMR/orig_asmr_by_material_clips/feature_flow_bninception_dim1024_21.5fps"
-    SAMPLES_FOLDER="asmr_by_material_validation_transformer"
+    SAMPLES_FOLDER="ceramic_validation_transformer"
     #SPLITS="\"[validation, ]\""
     SAMPLER_BATCHSIZE=4
     SAMPLES_PER_VIDEO=$VAS_SAMPLES_PER_VIDEO
@@ -42,8 +43,8 @@ else
     exit
 fi
 
-NOW="eval_best_val"
-CKPT="best"
+NOW="eval_last_ckpt"
+CKPT="last"
 # Some info to print
 echo "Local Scratch" $LOCAL_SCRATCH
 echo "Hostlist:" $HOSTLIST
