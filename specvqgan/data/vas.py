@@ -88,7 +88,7 @@ class ResampleFrames(object):
 
 class VASSpecs(torch.utils.data.Dataset):
 
-    def __init__(self, split, spec_dir_path, dataset_type='asmr_ceramic', mel_num=None, spec_len=None, spec_crop_len=None,
+    def __init__(self, split, spec_dir_path, dataset_type='five_class_tapping', mel_num=None, spec_len=None, spec_crop_len=None,
                  random_crop=None, crop_coord=None, for_which_class=None, split_path=None):
         super().__init__()
         self.split = split
@@ -107,6 +107,10 @@ class VASSpecs(torch.utils.data.Dataset):
                 self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_1hr_train.txt"
             elif dataset_type == 'asmr_ceramic':
                 self.split_path = f'/juno/u/jyau/regnet/filelists/ceramic_train.txt'
+            elif dataset_type == "five_class_tapping":
+                self.split_path = f"/juno/u/jyau/regnet/filelists/tapping_data_five_classes_train.txt"
+            elif dataset_type == "tapping_cleaned":
+                self.split_path = f"/juno/u/jyau/regnet/filelists/tapping_data_cleaned_train.txt"
             else:
                 raise Exception("dataset type doesn't exist")
         elif split == 'valid':
@@ -118,6 +122,10 @@ class VASSpecs(torch.utils.data.Dataset):
                 self.split_path = f"/juno/u/jyau/regnet/filelists/asmr_by_material_1hr_test.txt"
             elif dataset_type == 'asmr_ceramic':
                 self.split_path = f'/juno/u/jyau/regnet/filelists/ceramic_test.txt'
+            elif dataset_type == "five_class_tapping":
+                self.split_path = f"/juno/u/jyau/regnet/filelists/tapping_data_five_classes_new_val.txt"
+            elif dataset_type == "tapping_cleaned":
+                self.split_path = f"/juno/u/jyau/regnet/filelists/tapping_data_cleaned_val.txt"
             else:
                 raise Exception
         self.feat_suffix = '_mel.npy'
@@ -148,6 +156,8 @@ class VASSpecs(torch.utils.data.Dataset):
             #unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
             # Use this line for getting classes for asmr_by_material clips
             unique_classes = sorted(list(set([self.__get_label__(cls_vid) for cls_vid in self.dataset])))
+        elif dataset_type.find('tapping') != -1:
+            unique_classes = sorted(list(set([self.get_tapping_label(cls_vid) for cls_vid in self.dataset])))
         else:
             raise Exception("wrong dataset type")
 
@@ -155,6 +165,11 @@ class VASSpecs(torch.utils.data.Dataset):
         print(f"unique classes: {unique_classes}")
 
         self.transforms = CropImage([mel_num, spec_crop_len], random_crop)
+
+    def get_tapping_label(self, video_name):
+        tokens = video_name.split("-")
+        label = tokens[0] + tokens[1]
+        return label
 
     def __get_label__(self, video_name):
         """Getting the corresponding label from the video name"""
@@ -198,6 +213,8 @@ class VASSpecs(torch.utils.data.Dataset):
         
         if self.dataset_type.find('asmr') != -1:
             cls = self.__get_label__(vid)
+        elif self.dataset_type.find('tapping') != -1:
+            cls = self.get_tapping_label(vid)
         
         item['label'] = cls
         item['target'] = self.label2target[cls]
@@ -235,7 +252,7 @@ class VASSpecsTest(VASSpecs):
 class VASFeats(torch.utils.data.Dataset):
 
     def __init__(self, split, rgb_feats_dir_path, flow_feats_dir_path, feat_len, feat_depth, feat_crop_len,
-                 replace_feats_with_random, random_crop, split_path, for_which_class, feat_sampler_cfg, dataset_type='asmr_ceramic'):
+                 replace_feats_with_random, random_crop, split_path, for_which_class, feat_sampler_cfg, dataset_type='five_class_tapping'):
         super().__init__()
         self.split = split
         self.rgb_feats_dir_path = rgb_feats_dir_path
