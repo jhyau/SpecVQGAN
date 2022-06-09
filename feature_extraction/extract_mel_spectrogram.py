@@ -153,7 +153,7 @@ TRANSFORMS = torchvision.transforms.Compose([
 
 def inv_transforms(x, folder_name='melspec_10s_22050hz'):
     '''relies on the GLOBAL contant TRANSFORMS which should be defined in this document'''
-    if folder_name == 'melspec_10s_22050hz':
+    if folder_name == 'melspec_10s_22050hz' or folder_name == 'melspec_10s_22050hz_melgan':
         i_transforms = deepcopy(TRANSFORMS.transforms[::-1])
     else:
         raise NotImplementedError
@@ -163,8 +163,8 @@ def inv_transforms(x, folder_name='melspec_10s_22050hz'):
     return i_transforms(x)
 
 
-def get_spectrogram(audio_path, save_dir, length, sr, folder_name='melspec_10s_22050hz', save_results=True):
-    wav, _ = librosa.load(audio_path, sr=None)
+def get_spectrogram(audio_path, save_dir, length, sr=None, folder_name='melspec_10s_22050hz', save_results=True):
+    wav, _ = librosa.load(audio_path, sr=sr)  #librosa.load(audio_path, sr=None)
     # this cannot be a transform without creating a huge overhead with inserting audio_name in each
     y = np.zeros(length)
     if wav.shape[0] < length:
@@ -172,7 +172,7 @@ def get_spectrogram(audio_path, save_dir, length, sr, folder_name='melspec_10s_2
     else:
         y = wav[:length]
 
-    if folder_name == 'melspec_10s_22050hz':
+    if folder_name == 'melspec_10s_22050hz' or folder_name == 'melspec_10s_22050hz_melgan':
         print('using', folder_name)
         mel_spec = TRANSFORMS(y)
     else:
@@ -193,16 +193,18 @@ if __name__ == '__main__':
     paser.add_argument("-i", "--input_dir", default="data/features/dog/audio_10s_22050hz")
     paser.add_argument("-o", "--output_dir", default="data/features/dog/melspec_10s_22050hz")
     paser.add_argument("-l", "--length", default=220500)
+    paser.add_argument("-sr", "--sampling_rate", default=None) # 22050
     paser.add_argument("-n", '--num_worker', type=int, default=32)
     args = paser.parse_args()
     input_dir = args.input_dir
     output_dir = args.output_dir
     length = args.length
+    sr = args.sampling_rate
 
     audio_paths = glob(P.join(input_dir, "*.wav"))
     audio_paths.sort()
 
     with Pool(args.num_worker) as p:
         p.map(partial(
-            get_spectrogram, save_dir=output_dir, length=length, folder_name=Path(output_dir).name
+            get_spectrogram, save_dir=output_dir, length=length, sr=sr, folder_name=Path(output_dir).name
         ), audio_paths)
