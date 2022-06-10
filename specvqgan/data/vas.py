@@ -123,7 +123,7 @@ class VASSpecs(torch.utils.data.Dataset):
             elif dataset_type == 'asmr_ceramic':
                 self.split_path = f'/juno/u/jyau/regnet/filelists/ceramic_test.txt'
             elif dataset_type == "five_class_tapping":
-                self.split_path = f"/juno/u/jyau/regnet/filelists/tapping_data_five_classes_new_val.txt"
+                self.split_path = f"/juno/u/jyau/regnet/filelists/tapping_data_five_classes_val.txt"
             elif dataset_type == "tapping_cleaned":
                 self.split_path = f"/juno/u/jyau/regnet/filelists/tapping_data_cleaned_val.txt"
             else:
@@ -285,6 +285,8 @@ class VASFeats(torch.utils.data.Dataset):
             labs = [x for x in rgb_feats_dir_path.split('/') if x]
             unique_classes = sorted(list(set([labs[-2]])))
             #unique_classes = sorted(list(set([cls_vid.split('/')[0] for cls_vid in self.dataset])))
+        elif self.dataset_type.find('tapping') != -1:
+            unique_classes = sorted(list(set([self.get_tapping_label(cls_vid) for cls_vid in self.dataset])))
         else:
             raise Exception("Wrong dataset type")
         self.label2target = {label: target for target, label in enumerate(unique_classes)}
@@ -295,6 +297,11 @@ class VASFeats(torch.utils.data.Dataset):
         # self.normalizer = StandardNormalizeFeats(rgb_feats_dir_path, flow_feats_dir_path, feat_len)
         # ResampleFrames
         self.feat_sampler = None if feat_sampler_cfg is None else instantiate_from_config(feat_sampler_cfg)
+
+    def get_tapping_label(self, video_name):
+        tokens = video_name.split("-")
+        label = tokens[0] + tokens[1]
+        return label
 
     def __get_label__(self, video_name):
         """Getting the corresponding label from the video name"""
@@ -359,6 +366,8 @@ class VASFeats(torch.utils.data.Dataset):
        
         if self.dataset_type.find('asmr') != -1:
             cls = self.__get_label__(vid)
+        elif self.dataset_type.find('tapping') != -1:
+            cls = self.get_tapping_label(vid)
         
         item['label'] = cls
         item['target'] = self.label2target[cls]
