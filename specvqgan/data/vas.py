@@ -168,7 +168,7 @@ class VASSpecs(torch.utils.data.Dataset):
 
     def get_tapping_label(self, video_name):
         tokens = video_name.split("-")
-        label = tokens[0] + tokens[1]
+        label = tokens[0] + "-"  + tokens[1]
         return label
 
     def __get_label__(self, video_name):
@@ -300,7 +300,7 @@ class VASFeats(torch.utils.data.Dataset):
 
     def get_tapping_label(self, video_name):
         tokens = video_name.split("-")
-        label = tokens[0] + tokens[1]
+        label = tokens[0] + "-"  + tokens[1]
         return label
 
     def __get_label__(self, video_name):

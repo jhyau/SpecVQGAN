@@ -44,25 +44,25 @@ lightning:
 data:
   target: train.SpectrogramDataModuleFromConfig
   params:
-    batch_size: 2  #3
+    batch_size: 3
     num_workers: 8
 
     spec_dir_path: '/juno/u/jyau/regnet/data/features/tapping/materials/melspec_10s_22050hz_melgan'
     sample_rate: 22050
     mel_num: 80
     spec_len: 860
-    spec_crop_len: 848 # 848, 1712
+    spec_crop_len: 848
     random_crop: False
 
     train:
       target: specvqgan.data.vas.VASSpecsTrain
       params:
         specs_dataset_cfg:
-          split_path: '/juno/u/jyau/regnet/filelists/tapping_data_five_classes_train.txt'
-          dataset_type: "asmr"
+          split_path: '/juno/u/jyau/regnet/filelists/tapping_data_cleaned_train.txt'
+          dataset_type: "tapping_cleaned"
     validation:
       target: specvqgan.data.vas.VASSpecsValidation
       params:
         specs_dataset_cfg:
-          split_path: '/juno/u/jyau/regnet/filelists/tapping_data_five_classes_new_val.txt'
-          dataset_type: "asmr"
+          split_path: '/juno/u/jyau/regnet/filelists/tapping_data_cleaned_val.txt'
+          dataset_type: "tapping_cleaned"
