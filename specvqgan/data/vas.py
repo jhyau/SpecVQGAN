@@ -88,7 +88,7 @@ class ResampleFrames(object):
 
 class VASSpecs(torch.utils.data.Dataset):
 
-    def __init__(self, split, spec_dir_path, dataset_type='five_class_tapping', mel_num=None, spec_len=None, spec_crop_len=None,
+    def __init__(self, split, spec_dir_path, dataset_type='tapping_cleaned', mel_num=None, spec_len=None, spec_crop_len=None,
                  random_crop=None, crop_coord=None, for_which_class=None, split_path=None):
         super().__init__()
         self.split = split
@@ -235,24 +235,24 @@ class VASSpecs(torch.utils.data.Dataset):
 
 class VASSpecsTrain(VASSpecs):
     def __init__(self, specs_dataset_cfg):
-        print(f"specs_dataset_cfg: {specs_dataset_cfg}")
+        print(f"train specs_dataset_cfg: {specs_dataset_cfg}")
         super().__init__('train', **specs_dataset_cfg)
 
 class VASSpecsValidation(VASSpecs):
     def __init__(self, specs_dataset_cfg):
-        print(f"specs_dataset_cfg: {specs_dataset_cfg}")
+        print(f"val specs_dataset_cfg: {specs_dataset_cfg}")
         super().__init__('valid', **specs_dataset_cfg)
 
 class VASSpecsTest(VASSpecs):
     def __init__(self, specs_dataset_cfg):
-        print(f"specs_dataset_cfg: {specs_dataset_cfg}")
+        print(f"test specs_dataset_cfg: {specs_dataset_cfg}")
         super().__init__('test', **specs_dataset_cfg)
 
 
 class VASFeats(torch.utils.data.Dataset):
 
     def __init__(self, split, rgb_feats_dir_path, flow_feats_dir_path, feat_len, feat_depth, feat_crop_len,
-                 replace_feats_with_random, random_crop, split_path, for_which_class, feat_sampler_cfg, dataset_type='five_class_tapping'):
+                 replace_feats_with_random, random_crop, split_path, for_which_class, feat_sampler_cfg, dataset_type='tapping_cleaned'):
         super().__init__()
         self.split = split
         self.rgb_feats_dir_path = rgb_feats_dir_path

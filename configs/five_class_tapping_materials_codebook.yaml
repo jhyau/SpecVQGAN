@@ -45,7 +45,7 @@ lightning:
 data:
   target: train.SpectrogramDataModuleFromConfig
   params:
-    batch_size: 2  #3
+    batch_size: 3
     num_workers: 8
 
     spec_dir_path: '/juno/u/jyau/regnet/data/features/tapping/materials/melspec_10s_22050hz_melgan'

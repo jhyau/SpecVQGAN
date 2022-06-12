@@ -23,6 +23,7 @@ def parse_args():
     parser.add_argument("--load_path", default=None)
     parser.add_argument("--sampling_rate", type=int, default=44100)
     parser.add_argument("--data_split_file_name", type=str)
+    parser.add_argument("--eval_set_suffix", default="val", type=str)
 
     parser.add_argument("--n_mel_channels", type=int, default=80)
     parser.add_argument("--ngf", type=int, default=32)
@@ -56,6 +57,9 @@ def main():
 
     root = Path(args.save_path)
     load_root = Path(args.load_path) if args.load_path else None
+
+    print("Loading from: ", load_root)
+
     root.mkdir(parents=True, exist_ok=True)
 
     ####################################
@@ -95,7 +99,7 @@ def main():
     )
     test_set = AudioDataset(
         Path(args.data_path),
-        Path(args.splits_path) / f'{args.data_split_file_name}_test.txt',
+        Path(args.splits_path) / f'{args.data_split_file_name}_{args.eval_set_suffix}.txt',  #f'{args.data_split_file_name}_test.txt',
         args.sampling_rate * 10,
         sampling_rate=args.sampling_rate,
         augment=False,
