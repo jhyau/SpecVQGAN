@@ -83,6 +83,9 @@ def load_model_and_dataloaders(cfg, device, is_ddp=False):
     # find the checkpoint path
     # e.g. checkpoints have names `epoch_000012.ckpt`
     print(f"Ckpt to retrieve: {cfg.sampler.ckpt}")
+    print(f"model logdir: {cfg.sampler.model_logdir}")
+    print(f"Path(cfg.sampler.model_logdir) / 'checkpoints/last.ckpt'")
+    print(cfg.sampler.ckpt)
     if (Path(cfg.sampler.model_logdir) / 'checkpoints/last.ckpt').exists() and cfg.sampler.ckpt == 'last':
         ckpt_model = Path(cfg.sampler.model_logdir) / 'checkpoints/last.ckpt'
     else:
