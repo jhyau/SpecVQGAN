@@ -41,6 +41,9 @@ def calculate_kl(featuresdict_1, featuresdict_2, feat_layer_name, dataset_name, 
     sharedkey_to_feats_1 = {path_to_sharedkey(p, dataset_name, classes): [] for p in paths_1}
     sharedkey_to_feats_2 = {path_to_sharedkey(p, dataset_name, classes): path_to_feats_2[p] for p in paths_2}
 
+    print(f"shared features1 keys: {sharedkey_to_feats_1.keys()}")
+    print(f"shared features2 keys: {sharedkey_to_feats_2.keys()}")
+
     # TODO: assert all 1s in 2 and their size is the same
 
     # grouping samples by vid name

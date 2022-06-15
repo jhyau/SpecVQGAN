@@ -13,10 +13,13 @@ logger = logging.getLogger(f'main.{__name__}')
 class StandardNormalizeAudio(object):
     '''
         Frequency-wise normalization
+        train_ids_path='./data/vggsound_train.txt'
     '''
-    def __init__(self, specs_dir, train_ids_path='./data/vggsound_train.txt', cache_path='./data/'):
+    def __init__(self, specs_dir, train_ids_path='/juno/u/jyau/regnet/filelists/tapping_data_five_classes_train.txt', cache_path='./data/'):
         self.specs_dir = specs_dir
         self.train_ids_path = train_ids_path
+        print(f"spec_dir: {specs_dir}")
+        print(f"train_ids_path: {train_ids_path}")
         # making the stats filename to match the specs dir name
         self.cache_path = os.path.join(cache_path, f'train_means_stds_{Path(specs_dir).stem}.txt')
         logger.info('Assuming that the input stats are calculated using preprocessed spectrograms (log)')

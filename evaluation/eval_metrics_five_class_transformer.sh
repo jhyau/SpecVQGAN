@@ -31,7 +31,7 @@ elif [[ "$DATASET" == "VAS" ]]; then
     SPEC_DIR_PATH="/juno/u/jyau/regnet/data/features/tapping/materials/melspec_10s_22050hz_melgan"
     RGB_FEATS_DIR_PATH="/juno/u/jyau/regnet/data/features/tapping/materials/feature_rgb_bninception_dim1024_21.5fps"
     FLOW_FEATS_DIR_PATH="/juno/u/jyau/regnet/data/features/tapping/materials/feature_flow_bninception_dim1024_21.5fps"
-    SAMPLES_FOLDER="five_class_tapping_transformer_validation_metrics"
+    SAMPLES_FOLDER="VAS_validation"
     #SPLITS="\"[validation, ]\""
     SAMPLER_BATCHSIZE=4
     SAMPLES_PER_VIDEO=$VAS_SAMPLES_PER_VIDEO

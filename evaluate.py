@@ -195,11 +195,13 @@ def main():
     out = {}
 
     print('Extracting features from input_1')
+    print("cfg.input1: ", cfg.input1)
     featuresdict_1 = get_featuresdict(feat_extractor, device, cfg.input1, is_ddp, **cfg.extraction_cfg)
 
     featuresdict_2 = None
     if cfg.input2 not in ['None', None, 'null', 'none']:
         print('Extracting features from input_2')
+        print("cfg.input2: ", cfg.input2)
         featuresdict_2 = get_featuresdict(feat_extractor, device, cfg.input2, is_ddp, **cfg.extraction_cfg)
 
     # pickle.dump(featuresdict_1, open('feats1.pkl', 'wb'))
