@@ -6,7 +6,7 @@
 #EXPERIMENT_PATH=./logs/2022-02-19T06-10-59_asmr_by_material_transformer_no_early_stop
 #EXPERIMENT_PATH=./logs/2022-02-23T07-48-24_asmr_by_material_1hr_transformer_no_early_stop
 #EXPERIMENT_PATH=./logs/2022-02-24T05-38-23_ceramic_transformer_no_early_stop
-EXPERIMENT_PATH=./logs/2022-06-13T10-25-55_five_class_tapping_materials_transformer
+EXPERIMENT_PATH=./logs/2022-06-19T05-57-36_tapping_materials_cleaned_transformer
 
 # Select a dataset here
 DATASET="VAS"
@@ -35,7 +35,7 @@ elif [[ "$DATASET" == "VAS" ]]; then
     SPEC_DIR_PATH="/juno/u/jyau/regnet/data/features/tapping/materials/melspec_10s_22050hz_melgan"
     RGB_FEATS_DIR_PATH="/juno/u/jyau/regnet/data/features/tapping/materials/feature_rgb_bninception_dim1024_21.5fps"
     FLOW_FEATS_DIR_PATH="/juno/u/jyau/regnet/data/features/tapping/materials/feature_flow_bninception_dim1024_21.5fps"
-    SAMPLES_FOLDER="five_class_tapping_transformer"
+    SAMPLES_FOLDER="tapping_cleaned_transformer"
     #SPLITS="\"[validation, ]\""
     SAMPLER_BATCHSIZE=4
     SAMPLES_PER_VIDEO=$VAS_SAMPLES_PER_VIDEO
@@ -44,9 +44,9 @@ else
     exit
 fi
 
-NOW="eval_with_melgan_five_classes_epochs_50000"
+NOW="eval_with_melgan_tapping_cleaned"
 CKPT="last"
-VOCODER="./vocoder/logs/five_classes_tapping_epochs_50000/"
+VOCODER="./vocoder/logs/tapping_cleaned/"
 # Some info to print
 echo "Local Scratch" $LOCAL_SCRATCH
 echo "Hostlist:" $HOSTLIST
