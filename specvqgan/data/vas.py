@@ -88,13 +88,13 @@ class ResampleFrames(object):
 
 class VASSpecs(torch.utils.data.Dataset):
 
-    def __init__(self, split, spec_dir_path, dataset_type='five_class_tapping', mel_num=None, spec_len=None, spec_crop_len=None,
+    def __init__(self, split, spec_dir_path, dataset_type='tapping_cleaned', mel_num=None, spec_len=None, spec_crop_len=None,
                  random_crop=None, crop_coord=None, for_which_class=None, split_path=None):
         super().__init__()
         self.split = split
         self.spec_dir_path = spec_dir_path
         self.dataset_type = dataset_type
-        print(f"split: {self.split}, dataset type: {dataset_type}")
+        print(f"split: {self.split}, dataset type: {dataset_type}, split_path: {split_path}")
 
         # fixing split_path in here because of compatibility with vggsound which hangles it in vggishish
         #self.split_path = f'./data/vas_{split}.txt'
@@ -252,7 +252,7 @@ class VASSpecsTest(VASSpecs):
 class VASFeats(torch.utils.data.Dataset):
 
     def __init__(self, split, rgb_feats_dir_path, flow_feats_dir_path, feat_len, feat_depth, feat_crop_len,
-                 replace_feats_with_random, random_crop, split_path, for_which_class, feat_sampler_cfg, dataset_type='five_class_tapping'):
+                 replace_feats_with_random, random_crop, split_path, for_which_class, feat_sampler_cfg, dataset_type='tapping_cleaned'):
         super().__init__()
         self.split = split
         self.rgb_feats_dir_path = rgb_feats_dir_path
