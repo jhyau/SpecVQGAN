@@ -42,9 +42,9 @@ else
     exit
 fi
 
-NOW="eval_with_melgan_five_class_epochs_50000"
+NOW="eval_with_melgan_five_class_epochs_70000"
 CKPT="last"
-VOCODER="./vocoder/logs/five_classes_tapping_epochs_50000/"
+VOCODER="./vocoder/logs/five_classes_tapping_epochs_70000/"
 # Some info to print
 echo "Local Scratch" $LOCAL_SCRATCH
 echo "Hostlist:" $HOSTLIST
